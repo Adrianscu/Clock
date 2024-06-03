@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clock</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #9e9e9e;
+
+
+        }
+
+        canvas {
+            border-radius: 50%;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="clockCanvas"></canvas>
+    <script>
+        const canvas = document.getElementById('clockCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const size = Math.min(window.innerWidth, window.innerHeight) * 0.9;
+        canvas.width = size;
+        canvas.height = size;
+
+        const radius = size / 2;
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+
+        function drawClock() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawFace();
+            drawNumbers();
+            drawTime();
+        }
+
+        function drawFace() {
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius * 0.9, 0, 2 * Math.PI);
+            ctx.fillStyle = 'whitesmoke';
+            ctx.fill();
+            ctx.lineWidth = radius * 0.5;
+            ctx.strokeStyle = 'grey';
+            ctx.stroke();
+            ctx.closePath();
+        }
+
+        function drawNumbers() {
+            ctx.font = radius * 0.15 + "px Times New Roman";
+            ctx.textBaseline = "middle";
+            ctx.textAlign = "center";
+            const romanNumerals = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
+            for (let hour = 0; hour < 12; hour++) {
+                const angle = (hour - 11) * Math.PI / 6;
+                const x = centerX + Math.sin(angle) * (radius * 0.8);
+                const y = centerY - Math.cos(angle) * (radius * 0.8);
+                ctx.fillText(romanNumerals[hour], x, y);
+            }
+        }
+
+        function drawTime() {
+            const now = new Date();
+            const hour = now.getHours();
+            const minute = now.getMinutes();
+            const second = now.getSeconds();
+
+            const hourAngle = (hour % 12 + minute / 60) * 30 * Math.PI / 180;
+            const minuteAngle = (minute + second / 60) * 6 * Math.PI / 180;
+            const secondAngle = second * 6 * Math.PI / 180;
+
+            drawHand(hourAngle, radius * 0.5, radius * 0.02);
+            drawHand(minuteAngle, radius * 0.65, radius * 0.01);
+            drawHand(secondAngle, radius * 0.7, radius * 0.005);
+        }
+
+        function drawHand(angle, length, width) {
+            ctx.beginPath();
+            ctx.lineWidth = width;
+            ctx.lineCap = "round";
+            ctx.moveTo(centerX, centerY);
+            ctx.lineTo(
+                centerX + Math.sin(angle) * length,
+                centerY - Math.cos(angle) * length
+            );
+            ctx.strokeStyle = 'black';
+            ctx.stroke();
+            ctx.closePath();
+        }
+
+        setInterval(drawClock, 1000);
+    </script>
+</body>
+
+</html>
